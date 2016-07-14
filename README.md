@@ -9,7 +9,48 @@
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
+##Usage
+
+// Import webService class
+
+import WebService
+
+// Basic Header Dictionary
+var httpHeaderRequestDict : NSMutableDictionary!{
+    get{
+        let mutableDict : NSMutableDictionary = NSMutableDictionary()
+        mutableDict.setValue("AUTHKEY", forKey: "Authorization")
+        mutableDict.setValue("application/json", forKey: "Content-Type")
+        return mutableDict
+    }
+}
+
+// Create webService object
+    var webServiceObject : WebService = WebService()
+    
+// Set header value for all request
+    webServiceObject.setDefaultHeaders(httpHeaderRequestDict)
+
+/**
+*  use webServiceObject.httpHeaders to set different headers required for this call.
+*/
+
+webServiceObject.sendRequest(URLString, parameters: params, requestType: .GET, success: {
+(response : NSHTTPURLResponse?, dictionary : AnyObject) in
+
+// Handle data when request Success
+
+}, failed: {
+(response : NSHTTPURLResponse?, ResponseDict : AnyObject?) in
+
+// Handle data when request fails
+
+}, encoded: false)
+
 ## Requirements
+
+iOS 8.0+
+Xcode 7.3.1+
 
 ## Installation
 

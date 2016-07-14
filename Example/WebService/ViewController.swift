@@ -7,12 +7,61 @@
 //
 
 import UIKit
+import WebService
 
 class ViewController: UIViewController {
+    
+    var httpHeaderRequestDict : NSMutableDictionary!{
+        
+        get{
+            let mutableDict : NSMutableDictionary = NSMutableDictionary()
+            mutableDict.setValue("AUTHKEY", forKey: "Authorization")
+            mutableDict.setValue("application/json", forKey: "Content-Type")
+            return mutableDict
+        }
+    }
+    
+    var webServiceObject : WebService = WebService()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        
+        /**
+            Set default HTTP headers for all the request
+         */
+        
+        webServiceObject.setDefaultHeaders(httpHeaderRequestDict)
+    
+    }
+    
+    /**
+     Send request
+     you can use the HTTP methods like .GET .POST .DELETE .PUT
+     Encoded variable is to ecode parameters to the URL. true/false
+     */
+    func sendRequets() {
+        
+        let URLString = ""
+        let params = [] // Dictionary type
+        
+        /**
+         *  use webServiceObject.httpHeaders to set different headers required for this call.
+         */
+        
+        webServiceObject.sendRequest(URLString, parameters: params, requestType: .GET, success: {
+            (response : NSHTTPURLResponse?, dictionary : AnyObject) in
+            
+            // Handle data when request Success
+            
+            }, failed: {
+                (response : NSHTTPURLResponse?, ResponseDict : AnyObject?) in
+            
+                // Handle data when request fails
+                
+            }, encoded: false)
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -20,5 +69,6 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    
 }
 

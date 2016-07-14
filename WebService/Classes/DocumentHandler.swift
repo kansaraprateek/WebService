@@ -1,9 +1,9 @@
 //
 //  DocumentHandler.swift
-//  Indition CRM Call Center
+//  WebService
 //
 //  Created by Prateek Kansara on 30/05/16.
-//  Copyright © 2016 prateek. All rights reserved.
+//  Copyright © 2016 Prateek. All rights reserved.
 //
 
 import Foundation

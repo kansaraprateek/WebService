@@ -1,18 +1,18 @@
 {
   "name": "WebService",
   "version": "0.1.0",
-  "summary": "A short description of WebService.",
+  "summary": "Basic HTTPS Service call block methods",
   "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/<GITHUB_USERNAME>/WebService",
+  "homepage": "https://github.com/kansaraprateek/WebService",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
   },
   "authors": {
-    "Prateek Kansara": "prateek@tagrem.com"
+    "Prateek Kansara": "prateek@kasnara.in"
   },
   "source": {
-    "git": "https://github.com/<GITHUB_USERNAME>/WebService.git",
+    "git": "https://github.com/kansaraprateek/WebService.git",
     "tag": "0.1.0"
   },
   "platforms": {

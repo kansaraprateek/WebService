@@ -1,15 +1,15 @@
 //
 //  WebService.swift
-//  Indition CRM Call Center
+//  WebService
 //
 //  Created by Prateek Kansara on 26/05/16.
-//  Copyright © 2016 prateek. All rights reserved.
+//  Copyright © 2016 Prateek. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-enum HTTPMethod: Int {
+public enum HTTPMethod: Int {
     case GET
     case POST
     case PUT
@@ -55,15 +55,18 @@ class HTTPHeaders: NSObject {
     }
 }
 
-class WebService: NSObject {
+public class WebService: NSObject {
     
     private var gURLString : NSString!
 
+    public
+    
     func setDefaultHeaders(headers : NSMutableDictionary) {
         let headersClass = HTTPHeaders.sharedInstance
         headersClass.setDefaultHttpHeadears(headers)
     }
     
+    public
     var httpHeaders : NSDictionary?
     
     /**
@@ -77,6 +80,7 @@ class WebService: NSObject {
      - parameter encoded:     bool value to determine parameter to be encoded within the url or not
      */
 
+    public
     func sendRequest(lUrl : String, parameters : AnyObject?, requestType : HTTPMethod, success : (NSHTTPURLResponse?, AnyObject) -> Void, failed : (NSHTTPURLResponse?, AnyObject?) -> Void, encoded : Bool) {
         let webSessionObject : WebServiceSession = WebServiceSession()
         webSessionObject.headerValues = httpHeaders
