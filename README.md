@@ -52,7 +52,7 @@ webServiceObject.sendRequest(URLString, parameters: params, requestType: .GET, s
 
 }, encoded: false)
 
-``
+```
 
 ## Requirements
 
@@ -66,7 +66,7 @@ it, simply add the following line to your Podfile:
 
 ```ruby
 pod "WebService"
-``
+```
 
 ## Author
 
