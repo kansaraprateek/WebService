@@ -1,0 +1,22 @@
+{
+  "name": "WebService",
+  "version": "0.1.0",
+  "summary": "A short description of WebService.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/<GITHUB_USERNAME>/WebService",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Prateek Kansara": "prateek@tagrem.com"
+  },
+  "source": {
+    "git": "https://github.com/<GITHUB_USERNAME>/WebService.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "WebService/Classes/**/*"
+}

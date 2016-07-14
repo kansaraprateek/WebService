@@ -1,0 +1,6 @@
+framework module WebService {
+  umbrella header "WebService-umbrella.h"
+
+  export *
+  module * { export * }
+}

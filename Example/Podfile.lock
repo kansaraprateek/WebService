@@ -1,0 +1,16 @@
+PODS:
+  - WebService (0.1.0)
+
+DEPENDENCIES:
+  - WebService (from `../`)
+
+EXTERNAL SOURCES:
+  WebService:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  WebService: 105a24ae3d2cd2fc8a6703bec4e5f7bfbb37c7c0
+
+PODFILE CHECKSUM: cdf09ebd2722cd56d7e62b9f78f4e85d1d159a3c
+
+COCOAPODS: 1.0.0

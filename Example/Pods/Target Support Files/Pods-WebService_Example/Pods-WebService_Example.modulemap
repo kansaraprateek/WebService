@@ -1,0 +1,6 @@
+framework module Pods_WebService_Example {
+  umbrella header "Pods-WebService_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}
