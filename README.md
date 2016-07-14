@@ -5,9 +5,19 @@
 [![License](https://img.shields.io/cocoapods/l/WebService.svg?style=flat)](http://cocoapods.org/pods/WebService)
 [![Platform](https://img.shields.io/cocoapods/p/WebService.svg?style=flat)](http://cocoapods.org/pods/WebService)
 
-## Example
+## Requirements
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+* iOS 8.0+
+Xcode 7.3.1+
+
+## Installation
+
+WebService is available through [CocoaPods](http://cocoapods.org). To install
+it, simply add the following line to your Podfile:
+
+```ruby
+pod "WebService"
+```
 
 ##Usage
 
@@ -54,19 +64,9 @@ webServiceObject.sendRequest(URLString, parameters: params, requestType: .GET, s
 
 ```
 
-## Requirements
+## Example
 
-* iOS 8.0+
-Xcode 7.3.1+
-
-## Installation
-
-WebService is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
-
-```ruby
-pod "WebService"
-```
+To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Author
 
