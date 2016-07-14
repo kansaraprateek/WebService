@@ -11,15 +11,15 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ##Usage
 
+```ruby
 // Import webService class
 
-```ruby
+
 import WebService
-``
 
 // Basic Header Dictionary
 
-```ruby
+
 var httpHeaderRequestDict : NSMutableDictionary!{
     get{
         let mutableDict : NSMutableDictionary = NSMutableDictionary()
@@ -35,12 +35,10 @@ var httpHeaderRequestDict : NSMutableDictionary!{
 // Set header value for all request
     webServiceObject.setDefaultHeaders(httpHeaderRequestDict)
 
-``
 
 
 *  use webServiceObject.httpHeaders to set different headers required for this call.
 
-```ruby
 
 webServiceObject.sendRequest(URLString, parameters: params, requestType: .GET, success: {
 (response : NSHTTPURLResponse?, dictionary : AnyObject) in
@@ -53,6 +51,7 @@ webServiceObject.sendRequest(URLString, parameters: params, requestType: .GET, s
 // Handle data when request fails
 
 }, encoded: false)
+
 ``
 
 ## Requirements
