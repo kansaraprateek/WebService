@@ -22,7 +22,7 @@ pod "WebService"
 
 ## Author
 
-Prateek Kansara, prateek@tagrem.com
+Prateek Kansara, prateek@kansara.in
 
 ## License
 

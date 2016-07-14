@@ -14,9 +14,10 @@
 		98CD939983779584F4166B0530B85FD6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC22C73C1608DFA5D5D78BDCB218219 /* Foundation.framework */; };
 		B1BE84C46F7B4762E0B40DB08B9CA503 /* Pods-WebService_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 16A3CF36A3AF39B83E1F725DF1952905 /* Pods-WebService_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF6EAED6A335473ADD61D6F5C6507B13 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC22C73C1608DFA5D5D78BDCB218219 /* Foundation.framework */; };
-		C8A46BB179D78C0D8EBE5DEA3DB03D2C /* ReplaceMe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8931014B274E9A80786B278EB555E10F /* ReplaceMe.swift */; };
 		CA9ED871662338623F5FB14B19F160A9 /* Pods-WebService_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = F37D063F10E9BF6172CE6EEA0AA014F7 /* Pods-WebService_Tests-dummy.m */; };
 		F1FD1A46F9DACDCF949D18666DA49CFD /* WebService-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D619DB5D5B4269210C91856133B9C93 /* WebService-dummy.m */; };
+		FAD3ECD51D375A7F0042E242 /* DocumentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD3ECD31D375A7F0042E242 /* DocumentHandler.swift */; };
+		FAD3ECD61D375A7F0042E242 /* WebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD3ECD41D375A7F0042E242 /* WebService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,7 +44,6 @@
 		71C81B6C73B7AD476CBC84C1CB4E3038 /* WebService.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = WebService.modulemap; sourceTree = "<group>"; };
 		7F2C3BDDEF04A089CD53C89B53B28B42 /* Pods-WebService_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-WebService_Example.release.xcconfig"; sourceTree = "<group>"; };
 		86A6475B40B3DD80E50D6937AD2415D4 /* Pods-WebService_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-WebService_Tests-frameworks.sh"; sourceTree = "<group>"; };
-		8931014B274E9A80786B278EB555E10F /* ReplaceMe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReplaceMe.swift; sourceTree = "<group>"; };
 		8DA6BA5E4B0CCC62C9CDD78A2C77A513 /* Pods-WebService_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-WebService_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
 		92714B762200C131C7CD74B860A2F633 /* Pods-WebService_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-WebService_Example.modulemap"; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -62,6 +62,8 @@
 		EE40F346D5AD83BA7C8F11F2F2AA0418 /* Pods-WebService_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-WebService_Example-dummy.m"; sourceTree = "<group>"; };
 		F37D063F10E9BF6172CE6EEA0AA014F7 /* Pods-WebService_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-WebService_Tests-dummy.m"; sourceTree = "<group>"; };
 		F788D6BFA75209374828EF8E897A1FE5 /* Pods-WebService_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-WebService_Tests.release.xcconfig"; sourceTree = "<group>"; };
+		FAD3ECD31D375A7F0042E242 /* DocumentHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentHandler.swift; sourceTree = "<group>"; };
+		FAD3ECD41D375A7F0042E242 /* WebService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,7 +171,8 @@
 		A7071B7804C05000B7999EACBE4FCBF9 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				8931014B274E9A80786B278EB555E10F /* ReplaceMe.swift */,
+				FAD3ECD31D375A7F0042E242 /* DocumentHandler.swift */,
+				FAD3ECD41D375A7F0042E242 /* WebService.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -337,7 +340,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C8A46BB179D78C0D8EBE5DEA3DB03D2C /* ReplaceMe.swift in Sources */,
 				F1FD1A46F9DACDCF949D18666DA49CFD /* WebService-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -346,7 +348,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAD3ECD61D375A7F0042E242 /* WebService.swift in Sources */,
 				1EEE29BC68789B2CB763633329C3D93C /* Pods-WebService_Example-dummy.m in Sources */,
+				FAD3ECD51D375A7F0042E242 /* DocumentHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -445,6 +449,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9EB29985CB07E5DD8459B455F591ABF7 /* Pods-WebService_Example.debug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -479,6 +484,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7F2C3BDDEF04A089CD53C89B53B28B42 /* Pods-WebService_Example.release.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
