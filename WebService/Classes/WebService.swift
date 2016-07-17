@@ -242,10 +242,9 @@ extension WebServiceSession: NSURLSessionDataDelegate{
 
     }
     
-    func WebServiceSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
+    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
         recievedData.appendData(data)
     }
-    
 }
 
 extension WebServiceSession : NSURLSessionTaskDelegate {
