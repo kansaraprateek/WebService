@@ -60,7 +60,7 @@ private var globalDestinationDocPath : NSString! {
 
 private let FILEBOUNDARY = "--ARCFormBoundarym9l3512x3aexw29"
 
-class DocumentHandler : NSObject {
+public class DocumentHandler : NSObject {
     
     var delegate : DocumentHandlerDelegate{
         set {
