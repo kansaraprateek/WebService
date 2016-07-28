@@ -74,7 +74,7 @@ public class DocumentHandler : NSObject {
     var  fileName : NSString!
     
     
-    class var sharedInstance: DocumentHandler {
+    public class var sharedInstance: DocumentHandler {
         struct Singleton {
             
             static let instance = DocumentHandler()
@@ -89,7 +89,7 @@ public class DocumentHandler : NSObject {
     
     var httpHeaders : NSDictionary?
     
-    func downloadDocument(urlString : NSString, documentID : NSString, Progress: (bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void, Success : (location : NSURL, taskDescription : NSString) -> Void, Error : (error : NSError) -> Void) {
+    public func downloadDocument(urlString : NSString, documentID : NSString, Progress: (bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void, Success : (location : NSURL, taskDescription : NSString) -> Void, Error : (error : NSError) -> Void) {
         
         let documetDownlaodSession : DocumentDownloader = DocumentDownloader.init(lURLString: urlString, lRequestType: "GET")
         documetDownlaodSession.uniqueID = documentID
