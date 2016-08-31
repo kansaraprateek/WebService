@@ -97,7 +97,7 @@ public class DocumentHandler : NSObject {
         documetDownlaodSession.downloadDocumentWithProgress(Progress, Success: Success, Error: Error)
     }
     
-    func uploadDocumentWithURl(urlString : NSString, parameters : NSDictionary, documentPath : NSArray, fieldName : String, Progress : (bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void, Success : (response : NSHTTPURLResponse) -> Void, Error : (response : NSHTTPURLResponse, error : NSError) -> Void) {
+    public func uploadDocumentWithURl(urlString : NSString, parameters : NSDictionary, documentPath : NSArray, fieldName : String, Progress : (bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void, Success : (response : NSHTTPURLResponse) -> Void, Error : (response : NSHTTPURLResponse, error : NSError) -> Void) {
         
         let data : NSData = createBodyWithBoundary(FILEBOUNDARY, parameters: parameters, paths: documentPath, fieldName: fieldName)
         

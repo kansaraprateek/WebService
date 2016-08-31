@@ -64,6 +64,11 @@ class ViewController: UIViewController {
         
     }
     
+    
+    func uploadDocument() {
+        let documentHandler = DocumentHandler()
+        
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
