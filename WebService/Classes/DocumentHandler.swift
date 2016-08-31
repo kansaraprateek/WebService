@@ -71,7 +71,7 @@ public class DocumentHandler : NSObject {
         }
     }
     
-    var  fileName : NSString!
+    public var  fileName : NSString!
     
     
     public class var sharedInstance: DocumentHandler {
@@ -81,13 +81,14 @@ public class DocumentHandler : NSObject {
         }
         return Singleton.instance
     }
-
+    
+    public
     func setDefaultHeaders(headers : NSMutableDictionary) {
         let headersClass = HTTPHeaders.sharedInstance
         headersClass.setDefaultDocumentHeaders(headers)
     }
     
-    var httpHeaders : NSDictionary?
+    public var httpHeaders : NSDictionary?
     
     public func downloadDocument(urlString : NSString, documentID : NSString, Progress: (bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void, Success : (location : NSURL, taskDescription : NSString) -> Void, Error : (error : NSError) -> Void) {
         
