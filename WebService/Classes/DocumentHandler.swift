@@ -90,7 +90,7 @@ public class DocumentHandler : NSObject {
     
     public var httpHeaders : NSDictionary?
     
-    public func downloadDocument(urlString : NSString, documentID : NSString, Progress: (bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void, Success : (location : NSURL, taskDescription : NSString) -> Void, Error : (error : NSError) -> Void) {
+    public func downloadDocument(urlString : NSString, documentID : NSString, Progress: (bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void, Success : (location : NSURL, taskDescription : NSString) -> Void, Error : (respones : NSHTTPURLResponse, error : NSError?) -> Void) {
         
         let documetDownlaodSession : DocumentDownloader = DocumentDownloader.init(lURLString: urlString, lRequestType: "GET")
         documetDownlaodSession.uniqueID = documentID
@@ -98,7 +98,7 @@ public class DocumentHandler : NSObject {
         documetDownlaodSession.downloadDocumentWithProgress(Progress, Success: Success, Error: Error)
     }
     
-    public func uploadDocumentWithURl(urlString : NSString, parameters : NSDictionary, documentPath : NSArray, fieldName : String, Progress : (bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void, Success : (response : NSHTTPURLResponse) -> Void, Error : (response : NSHTTPURLResponse, error : NSError) -> Void) {
+    public func uploadDocumentWithURl(urlString : NSString, parameters : NSDictionary?, documentPath : NSArray, fieldName : String, Progress : (bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void, Success : (response : NSHTTPURLResponse) -> Void, Error : (response : NSHTTPURLResponse, error : NSError?) -> Void) {
         
         let data : NSData = createBodyWithBoundary(FILEBOUNDARY, parameters: parameters, paths: documentPath, fieldName: fieldName)
         
@@ -110,11 +110,11 @@ public class DocumentHandler : NSObject {
         uploadDocument.uploadDocumentWithURl(urlString, formData: data, uniqueID: self.fileName, Progress: Progress, Success: Success, Error: Error)
     }
     
-    private func createBodyWithBoundary(boundary : String, parameters : NSDictionary, paths : NSArray, fieldName : String) -> NSData {
+    private func createBodyWithBoundary(boundary : String, parameters : NSDictionary?, paths : NSArray, fieldName : String) -> NSData {
         
         let httpBody : NSMutableData = NSMutableData()
         
-        parameters.enumerateKeysAndObjectsUsingBlock({(parameterKey : AnyObject, parameterValue : AnyObject, stop : UnsafeMutablePointer<ObjCBool>) in
+        parameters?.enumerateKeysAndObjectsUsingBlock({(parameterKey : AnyObject, parameterValue : AnyObject, stop : UnsafeMutablePointer<ObjCBool>) in
             
             httpBody.appendData(String(format: "--%@\r\n", boundary).dataUsingEncoding(NSUTF8StringEncoding)!)
             httpBody.appendData(String(format: "Content-Disposition: form-data; name=\"%@\"\r\n\r\n", parameterKey as! String).dataUsingEncoding(NSUTF8StringEncoding)!)
@@ -163,9 +163,11 @@ private class DocumentDownloader: NSObject {
     
     private var inProgress : ((bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void)?
     private var onSuccess : ((location : NSURL, taskDescription : NSString) -> Void)?
-    private var onError : ((error : NSError) -> Void)?
+    private var onError : ((respones : NSHTTPURLResponse, error : NSError?) -> Void)?
     
     private var headerValues : NSDictionary?
+    
+    private var gResponse : NSHTTPURLResponse!
     
     private var mutableRequest : NSMutableURLRequest! {
         set{
@@ -221,7 +223,7 @@ private class DocumentDownloader: NSObject {
         urlString = lURLString
     }
     
-    private func downloadDocumentWithProgress(Progress : (bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void, Success: (location : NSURL, taskDescription : NSString) -> Void, Error : (error : NSError) -> Void) {
+    private func downloadDocumentWithProgress(Progress : (bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void, Success: (location : NSURL, taskDescription : NSString) -> Void, Error : (respones : NSHTTPURLResponse, error : NSError?) -> Void) {
         
         onError = Error
         onSuccess = Success
@@ -240,6 +242,7 @@ private class DocumentDownloader: NSObject {
 extension DocumentDownloader: NSURLSessionDataDelegate{
     
     @objc func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
+        gResponse = response as? NSHTTPURLResponse
         completionHandler(.Allow);
     }
 }
@@ -247,7 +250,12 @@ extension DocumentDownloader: NSURLSessionDataDelegate{
 extension DocumentDownloader : NSURLSessionDownloadDelegate{
     
     @objc func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
-        self.onSuccess!(location: location, taskDescription: "Downloaded")
+        if gResponse.statusCode == 200{
+            self.onSuccess!(location: location, taskDescription: "Downloaded")
+        }
+        else{
+            self.onError!(respones: gResponse, error: nil)
+        }
     }
     @objc func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         
@@ -262,7 +270,7 @@ private class DocumentUploader : NSObject {
     private var uniqueID : NSString!
     
     private var onSuccess : ((response : NSHTTPURLResponse) -> Void)?
-    private var onError : ((response : NSHTTPURLResponse, error : NSError) -> Void)?
+    private var onError : ((response : NSHTTPURLResponse, error : NSError?) -> Void)?
     private var inProgress : ((bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void)?
     
     private var headerValues : NSMutableDictionary?
@@ -300,7 +308,7 @@ private class DocumentUploader : NSObject {
                 lMutableRequest.setValue(val as? String, forHTTPHeaderField: key as! String)
             })
             
-            if gRequestType.isEqual("POST") {
+            if gRequestType.isEqual("POST")  || gRequestType.isEqual("PUT"){
                 let mutipartContentType = NSString(format: "multipart/form-data; boundary=%@", FILEBOUNDARY)
                 lMutableRequest.setValue(mutipartContentType as String, forHTTPHeaderField: "Content-Type")
             }
@@ -310,7 +318,7 @@ private class DocumentUploader : NSObject {
     }
 
     
-    private func uploadDocumentWithURl(urlString : NSString, formData : NSData, uniqueID : NSString, Progress : (bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void, Success : (response : NSHTTPURLResponse) -> Void, Error : (response : NSHTTPURLResponse, error : NSError) -> Void) {
+    private func uploadDocumentWithURl(urlString : NSString, formData : NSData, uniqueID : NSString, Progress : (bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void, Success : (response : NSHTTPURLResponse) -> Void, Error : (response : NSHTTPURLResponse, error : NSError?) -> Void) {
         
         self.gRequestType = "POST"
         self.gURl = urlString
@@ -335,7 +343,7 @@ extension DocumentUploader: NSURLSessionDataDelegate{
     @objc func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
         gResponse = response as? NSHTTPURLResponse
         
-        print("\(gResponse)")
+//        print("\(gResponse)")
         completionHandler(.Allow);
     }
 }
@@ -345,19 +353,19 @@ extension DocumentUploader : NSURLSessionTaskDelegate{
     
     @objc func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
         
-        print("session \(session) task : \(task) error : \(error)")
-        if error == nil {
+//        print("session \(session) task : \(task) error : \(error)")
+        if error == nil && gResponse.statusCode == 200 {
             self.onSuccess!(response: gResponse)
         }
         else{
-            self.onError!(response: gResponse, error: error!)
+            self.onError!(response: gResponse, error: error)
         }
         
     }
     
     @objc func URLSession(session: NSURLSession, task: NSURLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
         
-        print("byte send \(bytesSent) expected : \(totalBytesExpectedToSend) ")
+//        print("byte send \(bytesSent) expected : \(totalBytesExpectedToSend) ")
         self.inProgress!(bytesSent: bytesSent, totalBytesSent: totalBytesSent, totalBytesExpectedToSend: totalBytesExpectedToSend)
         
     }
