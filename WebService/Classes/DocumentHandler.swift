@@ -163,7 +163,7 @@ private class DocumentDownloader: NSObject {
     
     private var inProgress : ((bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void)?
     private var onSuccess : ((location : NSURL, taskDescription : NSString) -> Void)?
-    private var onError : ((respones : NSHTTPURLResponse, error : NSError?) -> Void)?
+    private var onError : ((response : NSHTTPURLResponse, error : NSError?) -> Void)?
     
     private var headerValues : NSDictionary?
     
@@ -203,12 +203,12 @@ private class DocumentDownloader: NSObject {
         }
         get{
             
-            let sessionConfig : NSURLSessionConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier(self.uniqueID as String)
+//            let sessionConfig = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier(self.uniqueID as String)
 //            let additionalHeaderDictionary : NSMutableDictionary = NSMutableDictionary ()
 //            additionalHeaderDictionary.setValue("application/json", forKey: "Content-Type")
 //            sessionConfig.HTTPAdditionalHeaders = additionalHeaderDictionary
             
-            return sessionConfig
+            return NSURLSessionConfiguration.defaultSessionConfiguration()
         }
     }
     
@@ -223,7 +223,7 @@ private class DocumentDownloader: NSObject {
         urlString = lURLString
     }
     
-    private func downloadDocumentWithProgress(Progress : (bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void, Success: (location : NSURL, taskDescription : NSString) -> Void, Error : (respones : NSHTTPURLResponse, error : NSError?) -> Void) {
+    private func downloadDocumentWithProgress(Progress : (bytesWritten : Int64, totalBytesWritten : Int64, remaining : Int64) -> Void, Success: (location : NSURL, taskDescription : NSString) -> Void, Error : (response : NSHTTPURLResponse, error : NSError?) -> Void) {
         
         onError = Error
         onSuccess = Success
@@ -254,7 +254,7 @@ extension DocumentDownloader : NSURLSessionDownloadDelegate{
             self.onSuccess!(location: location, taskDescription: "Downloaded")
         }
         else{
-            self.onError!(respones: gResponse, error: nil)
+            self.onError!(response: gResponse, error: nil)
         }
     }
     @objc func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
