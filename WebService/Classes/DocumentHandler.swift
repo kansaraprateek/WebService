@@ -203,12 +203,12 @@ private class DocumentDownloader: NSObject {
         }
         get{
             
-//            let sessionConfig = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier(self.uniqueID as String)
+            let sessionConfig = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier(self.uniqueID as String)
 //            let additionalHeaderDictionary : NSMutableDictionary = NSMutableDictionary ()
 //            additionalHeaderDictionary.setValue("application/json", forKey: "Content-Type")
 //            sessionConfig.HTTPAdditionalHeaders = additionalHeaderDictionary
             
-            return NSURLSessionConfiguration.defaultSessionConfiguration()
+            return sessionConfig
         }
     }
     
@@ -241,7 +241,7 @@ private class DocumentDownloader: NSObject {
 
 extension DocumentDownloader: NSURLSessionDataDelegate{
     
-    @objc func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
+    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
         gResponse = response as? NSHTTPURLResponse
         completionHandler(.Allow);
     }
@@ -250,16 +250,20 @@ extension DocumentDownloader: NSURLSessionDataDelegate{
 extension DocumentDownloader : NSURLSessionDownloadDelegate{
     
     @objc func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
-        if gResponse.statusCode == 200{
+//        if gResponse.statusCode == 200{
             self.onSuccess!(location: location, taskDescription: "Downloaded")
-        }
-        else{
-            self.onError!(response: gResponse, error: nil)
-        }
+//        }
+//        else{
+//            self.onError!(response: gResponse, error: nil)
+//        }
     }
     @objc func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         
         self.inProgress!(bytesWritten: bytesWritten, totalBytesWritten: totalBytesWritten, remaining: totalBytesExpectedToWrite)
+    }
+    
+    private func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
+        self.onError!(response: gResponse, error: error)
     }
 }
 
@@ -340,7 +344,7 @@ private class DocumentUploader : NSObject {
 
 extension DocumentUploader: NSURLSessionDataDelegate{
     
-    @objc func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
+    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
         gResponse = response as? NSHTTPURLResponse
         
 //        print("\(gResponse)")
