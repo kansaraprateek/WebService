@@ -358,7 +358,7 @@ extension DocumentUploader : NSURLSessionTaskDelegate{
     @objc func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
         
 //        print("session \(session) task : \(task) error : \(error)")
-        if error == nil && gResponse.statusCode == 200 {
+        if error == nil || gResponse?.statusCode == 200 {
             self.onSuccess!(response: gResponse)
         }
         else{

@@ -208,7 +208,7 @@ class WebServiceSession: NSObject {
                 encodedParamArray.addObject(NSString(format: "%@=%@", PercentEscapedQueryKeyFromStringWithEncoding(parameterKey as! NSString), PercentEscapedQueryKeyFromStringWithEncoding(parameterValue as! NSString)))
             })
             
-            let encodedURL : NSString = NSString(format: "%@%@", gURLString, encodedParamArray.componentsJoinedByString("&"))
+            let encodedURL : NSString = NSString(format: "%@?%@", gURLString, encodedParamArray.componentsJoinedByString("&"))
             gURLString = encodedURL
         }
         
