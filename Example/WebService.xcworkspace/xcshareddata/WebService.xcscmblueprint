@@ -9,7 +9,7 @@
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "3986BB2B-C9D7-484B-8004-FDEA47315A52",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
-    "F3C1591419505741A85CA53D8E9FC62BDE4DCCFB" : "",
+    "F3C1591419505741A85CA53D8E9FC62BDE4DCCFB" : "..",
     "A81E7899B83B88BE84FD4D49DAB4677C241BD09D" : "WebService\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "WebService",

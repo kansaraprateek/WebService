@@ -263,17 +263,19 @@ extension WebServiceSession : NSURLSessionTaskDelegate {
                 catch{
                     print("serialization failed")
                     let error : NSError = NSError.init(domain: "SerializationFailed", code: 0, userInfo: nil)
-                    onError!(httpResponse, error)
+                    if httpResponse!.statusCode == 200 {
+                        onSuccess!(httpResponse, ["message" : "success"])
+                    }
+                    else{
+                        onError!(httpResponse, error)
+                    }
                     return
                 }
                 
                 if httpResponse!.statusCode == 200 {
-                
                     onSuccess!(httpResponse, responseDict)
-            
                 }
-                else
-                {
+                else{
                     onError!(httpResponse, responseDict)
                 }
         }
