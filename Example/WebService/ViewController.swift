@@ -44,19 +44,19 @@ class ViewController: UIViewController {
     func sendRequets() {
         
         let URLString = ""
-        let params = [] // Dictionary type
+        let params = "" // Dictionary type
         
         /**
          *  use webServiceObject.httpHeaders to set different headers required for this call.
          */
         
-        webServiceObject.sendRequest(URLString, parameters: params, requestType: .GET, success: {
-            (response : NSHTTPURLResponse?, dictionary : AnyObject) in
+        webServiceObject.sendRequest(URLString, parameters: params as AnyObject?, requestType: .get, success: {
+            (response : HTTPURLResponse?, dictionary : Any) in
             
             // Handle data when request Success
             
             }, failed: {
-                (response : NSHTTPURLResponse?, ResponseDict : AnyObject?) in
+                (response : HTTPURLResponse?, ResponseDict : Any?) in
             
                 // Handle data when request fails
                 

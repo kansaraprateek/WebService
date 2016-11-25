@@ -8,27 +8,47 @@
 
 import Foundation
 import UIKit
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 public enum HTTPMethod: Int {
-    case GET
-    case POST
-    case PUT
-    case DELETE
+    case get
+    case post
+    case put
+    case delete
 };
 
 
-private let kAFCharactersToBeEscapedInQueryString : NSCharacterSet = NSCharacterSet(charactersInString : ":/?&=;+!@#$()',*")
+private let kAFCharactersToBeEscapedInQueryString : CharacterSet = CharacterSet(charactersIn : ":/?&=;+!@#$()',*")
 
-private func PercentEscapedQueryKeyFromStringWithEncoding(lString : NSString) -> NSString {
+private func PercentEscapedQueryKeyFromStringWithEncoding(_ lString : NSString) -> NSString {
     
-    return lString.stringByAddingPercentEncodingWithAllowedCharacters(kAFCharactersToBeEscapedInQueryString)!
+    return lString.addingPercentEncoding(withAllowedCharacters: kAFCharactersToBeEscapedInQueryString)! as NSString
 }
 
 class HTTPHeaders: NSObject {
     
-    private var defaultHTTPHeaders : NSMutableDictionary!
+    fileprivate var defaultHTTPHeaders : NSMutableDictionary!
     
-    private var defaultDocumentHTTPHeaders : NSMutableDictionary!
+    fileprivate var defaultDocumentHTTPHeaders : NSMutableDictionary!
     
     class var sharedInstance: HTTPHeaders {
         struct Singleton {
@@ -38,7 +58,7 @@ class HTTPHeaders: NSObject {
         return Singleton.instance
     }
     
-    func setDefaultHttpHeadears (headers : NSMutableDictionary){
+    func setDefaultHttpHeadears (_ headers : NSMutableDictionary){
         defaultHTTPHeaders = headers
     }
     
@@ -46,7 +66,7 @@ class HTTPHeaders: NSObject {
         return defaultHTTPHeaders
     }
     
-    func setDefaultDocumentHeaders(headers : NSMutableDictionary)  {
+    func setDefaultDocumentHeaders(_ headers : NSMutableDictionary)  {
         defaultDocumentHTTPHeaders = headers
     }
     
@@ -55,18 +75,18 @@ class HTTPHeaders: NSObject {
     }
 }
 
-public class WebService: NSObject {
+open class WebService: NSObject {
     
-    private var gURLString : NSString!
+    fileprivate var gURLString : NSString!
 
-    public
+    open
     
-    func setDefaultHeaders(headers : NSMutableDictionary) {
+    func setDefaultHeaders(_ headers : NSMutableDictionary) {
         let headersClass = HTTPHeaders.sharedInstance
         headersClass.setDefaultHttpHeadears(headers)
     }
     
-    public
+    open
     var httpHeaders : NSDictionary?
     
     /**
@@ -80,11 +100,11 @@ public class WebService: NSObject {
      - parameter encoded:     bool value to determine parameter to be encoded within the url or not
      */
 
-    public
-    func sendRequest(lUrl : String, parameters : AnyObject?, requestType : HTTPMethod, success : (NSHTTPURLResponse?, AnyObject) -> Void, failed : (NSHTTPURLResponse?, AnyObject?) -> Void, encoded : Bool) {
+    open
+    func sendRequest(_ lUrl : String, parameters : AnyObject?, requestType : HTTPMethod, success : @escaping (HTTPURLResponse?, Any) -> Void, failed : @escaping (HTTPURLResponse?, Any?) -> Void, encoded : Bool) {
         let webSessionObject : WebServiceSession = WebServiceSession()
         webSessionObject.headerValues = httpHeaders
-        webSessionObject.sendHTTPRequestWithURL(lUrl, requestType: requestType, parameters: parameters, success: success, failed: failed, lEncoded: encoded)
+        webSessionObject.sendHTTPRequestWithURL(lUrl as NSString, requestType: requestType, parameters: parameters, success: success, failed: failed, lEncoded: encoded)
     }
 }
 
@@ -92,48 +112,48 @@ public class WebService: NSObject {
 
 class WebServiceSession: NSObject {
     
-    private var onSuccess :  ((NSHTTPURLResponse?, AnyObject) -> Void)?
-    private var onError :  ((NSHTTPURLResponse?, AnyObject?) -> Void)?
+    fileprivate var onSuccess :  ((HTTPURLResponse?, Any) -> Void)?
+    fileprivate var onError :  ((HTTPURLResponse?, Any?) -> Void)?
     
-    private var gURLString : NSString = ""
-    private var gRequestType : HTTPMethod = .GET
+    fileprivate var gURLString : NSString = ""
+    fileprivate var gRequestType : HTTPMethod = .get
     
-    private var recievedData : NSMutableData!
+    fileprivate var recievedData : Data!
     
-    private var gResponse : NSURLResponse!
-    private var gParameters : AnyObject?
+    fileprivate var gResponse : URLResponse!
+    fileprivate var gParameters : AnyObject?
     
-    private var encoded : Bool!
+    fileprivate var encoded : Bool!
     
-    private var dataTask : NSURLSessionDataTask!
+    fileprivate var dataTask : URLSessionDataTask!
     
     
     /// Mutable Request
     
-    private var headerValues : NSDictionary?
+    fileprivate var headerValues : NSDictionary?
     
-    private var mutableRequest : NSMutableURLRequest! {
+    fileprivate var mutableRequest : URLRequest! {
         set{
             self.mutableRequest = newValue
         }
         get {
             
-            let lMutableRequest : NSMutableURLRequest = NSMutableURLRequest(URL: NSURL(string: self.gURLString as String)!)
+            var lMutableRequest : URLRequest = URLRequest(url: URL(string: self.gURLString as String)!)
             lMutableRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            lMutableRequest.HTTPMethod = self.getRequestType()
+            lMutableRequest.httpMethod = self.getRequestType()
             let httpHeaderClass = HTTPHeaders.sharedInstance
             if headerValues == nil {
                 headerValues = httpHeaderClass.getHTTPHeaders()
             }
             
-            headerValues?.enumerateKeysAndObjectsUsingBlock({
-                (key : AnyObject, val : AnyObject, stop :UnsafeMutablePointer<ObjCBool>) in
+            headerValues?.enumerateKeysAndObjects({
+                (key : Any, val : Any, stop :UnsafeMutablePointer<ObjCBool>) in
                 lMutableRequest.setValue(val as? String, forHTTPHeaderField: key as! String)
-            })
+            } as! (Any, Any, UnsafeMutablePointer<ObjCBool>) -> Void)
             
             if gParameters?.count > 0 && !encoded{
                 do{
-                    lMutableRequest.HTTPBody = try NSJSONSerialization.dataWithJSONObject(gParameters!, options: .PrettyPrinted)
+                    lMutableRequest.httpBody = try JSONSerialization.data(withJSONObject: gParameters!, options: .prettyPrinted)
                 }
                 catch{
                     print("error in parameters")
@@ -144,7 +164,7 @@ class WebServiceSession: NSObject {
         }
     }
     
-    private var session : NSURLSession!
+    fileprivate var session : Foundation.URLSession!
     
     /**
      Request method enum to String
@@ -152,16 +172,16 @@ class WebServiceSession: NSObject {
      - returns: returns string as request type
      */
     
-    private func getRequestType() -> String {
+    fileprivate func getRequestType() -> String {
         
         switch self.gRequestType {
-        case .POST:
+        case .post:
             return "POST"
-        case .GET:
+        case .get:
             return "GET"
-        case .PUT:
+        case .put:
             return "PUT"
-        case .DELETE:
+        case .delete:
             return "DELETE"
         }
     }
@@ -176,7 +196,7 @@ class WebServiceSession: NSObject {
      - parameter failed:      failed block when service fails
      - parameter lEncoded:    bool value to determine parameter to be encoded within the url or not
      */
-    func sendHTTPRequestWithURL(url : NSString, requestType: HTTPMethod, parameters: AnyObject?,success : (NSHTTPURLResponse?, AnyObject) -> Void, failed : (NSHTTPURLResponse?, AnyObject?) -> Void, lEncoded : Bool)  {
+    func sendHTTPRequestWithURL(_ url : NSString, requestType: HTTPMethod, parameters: AnyObject?,success : @escaping (HTTPURLResponse?, Any) -> Void, failed : @escaping (HTTPURLResponse?, Any?) -> Void, lEncoded : Bool)  {
         gURLString = url
         gRequestType = requestType
         encoded = lEncoded
@@ -186,7 +206,7 @@ class WebServiceSession: NSObject {
         onError = failed
         
         if lEncoded {
-            encodedRequestWithParameters(parameters)
+            encodedRequestWithParameters(parameters as AnyObject?)
         }
         else{
             gParameters = parameters
@@ -197,23 +217,26 @@ class WebServiceSession: NSObject {
     /**
      Encoded request with parameters
      
-     - parameter params: Anyobject with dictionary of params
+     - parameter params: Any with dictionary of params
      */
-    private func encodedRequestWithParameters(params : AnyObject?) {
+    private func encodedRequestWithParameters(_ params : AnyObject?) {
         
         let encodedParamArray : NSMutableArray = NSMutableArray()
         if ((params?.count) != nil) {
-            params!.enumerateKeysAndObjectsUsingBlock({(parameterKey : AnyObject, parameterValue : AnyObject, stop : UnsafeMutablePointer<ObjCBool>) in
+            
+            params!.enumerateKeysAndObjects({
+                (parameterKey : Any, parameterValue : Any, stop : UnsafeMutablePointer<ObjCBool>) in
                 
-                encodedParamArray.addObject(NSString(format: "%@=%@", PercentEscapedQueryKeyFromStringWithEncoding(parameterKey as! NSString), PercentEscapedQueryKeyFromStringWithEncoding(parameterValue as! NSString)))
+                encodedParamArray.add(NSString(format: "%@=%@", PercentEscapedQueryKeyFromStringWithEncoding(parameterKey as! NSString), PercentEscapedQueryKeyFromStringWithEncoding(parameterValue as! NSString)))
             })
             
-            let encodedURL : NSString = NSString(format: "%@?%@", gURLString, encodedParamArray.componentsJoinedByString("&"))
+            let encodedURL : NSString = NSString(format: "%@?%@", gURLString, encodedParamArray.componentsJoined(by: "&"))
             gURLString = encodedURL
         }
         
-        session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration(), delegate: self, delegateQueue: NSOperationQueue.mainQueue())
-        dataTask = session.dataTaskWithRequest(mutableRequest)
+        session = Foundation.URLSession(configuration: URLSessionConfiguration.default, delegate: self, delegateQueue: OperationQueue.main)
+        
+        dataTask = session.dataTask(with: mutableRequest)
         dataTask.resume()
         
     }
@@ -223,41 +246,41 @@ class WebServiceSession: NSObject {
      */
     private func sendRequest(){
         
-        session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration(), delegate: self, delegateQueue: NSOperationQueue.mainQueue())
-        dataTask = session.dataTaskWithRequest(mutableRequest)
+        session = Foundation.URLSession(configuration: URLSessionConfiguration.default, delegate: self, delegateQueue: OperationQueue.main)
+        dataTask = session.dataTask(with: mutableRequest)
         
         dataTask.resume()
     }
 }
 
-extension WebServiceSession: NSURLSessionDataDelegate{
+extension WebServiceSession: URLSessionDataDelegate{
     
-    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         
         gResponse = response
         recievedData = nil
-        recievedData = NSMutableData()
+        recievedData = Data()
         
-        completionHandler(.Allow);
+        completionHandler(.allow);
 
     }
     
-    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
-        recievedData.appendData(data)
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        recievedData.append(data)
     }
 }
 
-extension WebServiceSession : NSURLSessionTaskDelegate {
+extension WebServiceSession : URLSessionTaskDelegate {
 
-    func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
-        let httpResponse = gResponse as? NSHTTPURLResponse
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        let httpResponse = gResponse as? HTTPURLResponse
         if (error == nil) {
             
             
-                let responseDict : AnyObject!
+                let responseDict : Any!
                 do{
                     
-                    responseDict = try NSJSONSerialization.JSONObjectWithData(recievedData, options: .AllowFragments)
+                    responseDict = try JSONSerialization.jsonObject(with: recievedData, options: .allowFragments)
                     //                print(responseDict)
                 }
                 catch{
