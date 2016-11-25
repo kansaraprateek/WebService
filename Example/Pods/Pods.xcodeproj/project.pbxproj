@@ -322,6 +322,9 @@
 					A1BC5B354677DEC6FB69246C5B7E1DE2 = {
 						LastSwiftMigration = 0800;
 					};
+					CDEAF8996D3D67B960738A0CAB02341F = {
+						LastSwiftMigration = 0800;
+					};
 				};
 			};
 			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
@@ -451,6 +454,7 @@
 				PRODUCT_NAME = Pods_WebService_Tests;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -484,6 +488,7 @@
 				PRODUCT_NAME = Pods_WebService_Tests;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
