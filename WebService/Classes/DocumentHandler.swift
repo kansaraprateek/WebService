@@ -142,9 +142,23 @@ open class DocumentHandler : NSObject {
         let docExtension : CFString = path.pathExtension as CFString
         let UTI  : CFString = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, docExtension, nil) as! CFString
         //        assert(UTI != nil)
-        let mimeType : AnyObject = (UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType) as? AnyObject)!
+
+        let mimeType = UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType)!
+        let mimeString = convertCfTypeToString(cfValue: mimeType)
+        return mimeString!
+    }
+    
+    private func convertCfTypeToString(cfValue: Unmanaged<CFString>!) -> NSString?{
         
-        return mimeType as! NSString
+        /* Coded by Vandad Nahavandipoor */
+        
+        let value = Unmanaged.fromOpaque(
+            cfValue.toOpaque()).takeUnretainedValue() as CFString
+        if CFGetTypeID(value) == CFStringGetTypeID(){
+            return value as NSString
+        } else {
+            return nil
+        }
     }
 }
 
@@ -241,7 +255,7 @@ private class DocumentDownloader: NSObject {
 
 extension DocumentDownloader: URLSessionDataDelegate{
     
-    func URLSession(_ session: Foundation.URLSession, dataTask: URLSessionDataTask, didReceiveResponse response: URLResponse, completionHandler: (Foundation.URLSession.ResponseDisposition) -> Void) {
+    func urlSession(_ session: Foundation.URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (Foundation.URLSession.ResponseDisposition) -> Void) {
         gResponse = response as? HTTPURLResponse
         completionHandler(.allow);
     }
@@ -344,7 +358,7 @@ private class DocumentUploader : NSObject {
 
 extension DocumentUploader: URLSessionDataDelegate{
     
-    func URLSession(_ session: Foundation.URLSession, dataTask: URLSessionDataTask, didReceiveResponse response: URLResponse, completionHandler: (Foundation.URLSession.ResponseDisposition) -> Void) {
+    func urlSession(_ session: Foundation.URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (Foundation.URLSession.ResponseDisposition) -> Void) {
         gResponse = response as? HTTPURLResponse
         
 //        print("\(gResponse)")

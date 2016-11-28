@@ -66,7 +66,7 @@ class ViewController: UIViewController {
     
     
     func uploadDocument() {
-        let documentHandler = DocumentHandler()
+        _ = DocumentHandler()
         
     }
 

@@ -149,7 +149,7 @@ class WebServiceSession: NSObject {
             headerValues?.enumerateKeysAndObjects({
                 (key : Any, val : Any, stop :UnsafeMutablePointer<ObjCBool>) in
                 lMutableRequest.setValue(val as? String, forHTTPHeaderField: key as! String)
-            } as! (Any, Any, UnsafeMutablePointer<ObjCBool>) -> Void)
+            } )
             
             if gParameters?.count > 0 && !encoded{
                 do{
