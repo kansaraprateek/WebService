@@ -33,7 +33,7 @@ class ViewController: UIViewController {
          */
         
         webServiceObject.setDefaultHeaders(httpHeaderRequestDict)
-    
+    sendRequets()
     }
     
     /**
@@ -43,7 +43,7 @@ class ViewController: UIViewController {
      */
     func sendRequets() {
         
-        let URLString = ""
+        let URLString = "https://randomuser.me/api/?results=10"
         let params = "" // Dictionary type
         
         /**
@@ -54,6 +54,7 @@ class ViewController: UIViewController {
             (response : HTTPURLResponse?, dictionary : Any) in
             
             // Handle data when request Success
+            print(dictionary)
             
             }, failed: {
                 (response : HTTPURLResponse?, ResponseDict : Any?) in

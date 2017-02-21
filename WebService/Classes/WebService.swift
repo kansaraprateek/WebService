@@ -275,32 +275,26 @@ extension WebServiceSession : URLSessionTaskDelegate {
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         let httpResponse = gResponse as? HTTPURLResponse
         if (error == nil) {
+            var responseObject : Any? = nil
+            let responseDict : Any!
+            do{
+                responseDict = try JSONSerialization.jsonObject(with: recievedData, options: .allowFragments)
+                responseObject = responseDict
+            }
+            catch{
+                responseObject = NSError.init(domain: "SerializationFailed", code: 0, userInfo: nil)
+            }
             
-            
-                let responseDict : Any!
-                do{
-                    
-                    responseDict = try JSONSerialization.jsonObject(with: recievedData, options: .allowFragments)
-                    //                print(responseDict)
+            if httpResponse!.statusCode == 200 {
+                if (recievedData != nil) {
+                    onSuccess!(httpResponse, recievedData)
+                }else{
+                    onSuccess!(httpResponse, responseObject ?? ["message" : "success"])
                 }
-                catch{
-                    print("serialization failed")
-                    let error : NSError = NSError.init(domain: "SerializationFailed", code: 0, userInfo: nil)
-                    if httpResponse!.statusCode == 200 {
-                        onSuccess!(httpResponse, ["message" : "success"])
-                    }
-                    else{
-                        onError!(httpResponse, error)
-                    }
-                    return
-                }
-                
-                if httpResponse!.statusCode == 200 {
-                    onSuccess!(httpResponse, responseDict)
-                }
-                else{
-                    onError!(httpResponse, responseDict)
-                }
+            }
+            else{
+                onError!(httpResponse, responseObject ?? ["message" : "failed"])
+            }
         }
         else{
             onError!(httpResponse, error!)
