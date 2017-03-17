@@ -24,7 +24,6 @@ extension URL {
 //        }
 //    }
 }
-
 private var globalFileManager : FileManager! {
     
     if FileManager.default.fileExists(atPath: globalDestinationDocPath as String) {
@@ -98,7 +97,7 @@ open class DocumentHandler : NSObject {
         documetDownlaodSession.downloadDocumentWithProgress(Progress, Success: Success, Error: Error)
     }
     
-    open func uploadDocumentWithURl(_ urlString : NSString, parameters : NSDictionary?, documentPath : NSArray, fieldName : String, Progress : @escaping (_ bytesSent: Int64, _ totalBytesSent: Int64, _ totalBytesExpectedToSend: Int64) -> Void, Success : @escaping (_ response : HTTPURLResponse) -> Void, Error : @escaping (_ response : HTTPURLResponse, _ error : NSError?) -> Void) {
+    open func uploadDocumentWithURl(_ urlString : NSString, parameters : NSDictionary?, documentPath : NSArray, fieldName : String, Progress : @escaping (_ bytesSent: Int64, _ totalBytesSent: Int64, _ totalBytesExpectedToSend: Int64) -> Void, Success : @escaping (_ response : HTTPURLResponse, Any) -> Void, Error : @escaping (_ response : HTTPURLResponse, _ error : Any?) -> Void) {
         
         let data : Data = createBodyWithBoundary(FILEBOUNDARY, parameters: parameters, paths: documentPath, fieldName: fieldName)
         
@@ -114,18 +113,19 @@ open class DocumentHandler : NSObject {
         
         let httpBody : NSMutableData = NSMutableData()
         
-        parameters?.enumerateKeysAndObjects({(parameterKey : AnyObject, parameterValue : AnyObject, stop : UnsafeMutablePointer<ObjCBool>) in
-            
+        parameters?.enumerateKeysAndObjects({
+            paramKey, paramValue, _ in
             httpBody.append(String(format: "--%@\r\n", boundary).data(using: String.Encoding.utf8)!)
-            httpBody.append(String(format: "Content-Disposition: form-data; name=\"%@\"\r\n\r\n", parameterKey as! String).data(using: String.Encoding.utf8)!)
-            httpBody.append(String(format: "%@\r\n", parameterValue as! String).data(using: String.Encoding.utf8)!)
-        } as! (Any, Any, UnsafeMutablePointer<ObjCBool>) -> Void)
+            httpBody.append(String(format: "Content-Disposition: form-data; name=\"%@\"\r\n\r\n", paramKey as! String).data(using: String.Encoding.utf8)!)
+            httpBody.append(String(format: "%@\r\n", paramValue as! String).data(using: String.Encoding.utf8)!)
+        })
         
         for path in paths {
             
-            let fileName = (path as! NSString).lastPathComponent
+            let fileName : NSString = (path as! NSString).lastPathComponent as NSString
             let data : Data = try! Data(contentsOf: URL(fileURLWithPath: path as! String))
-            let mimeType : NSString = (URL(string: path as! String)?.lastPathComponent)! as NSString
+            let mimeType : NSString = fileName.pathExtension as NSString
+//                (URL(string: path as! String)?.lastPathComponent)! as NSString
             httpBody.append(String(format: "--%@\r\n", boundary).data(using: String.Encoding.utf8)!)
             httpBody.append(String(format: "Content-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\n", fieldName, fileName).data(using: String.Encoding.utf8)!)
             httpBody.append(String(format: "Content-Type: %@\r\n\r\n", mimeType).data(using: String.Encoding.utf8)!)
@@ -142,7 +142,7 @@ open class DocumentHandler : NSObject {
         let docExtension : CFString = path.pathExtension as CFString
         let UTI  : CFString = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, docExtension, nil) as! CFString
         //        assert(UTI != nil)
-
+        
         let mimeType = UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType)!
         let mimeString = convertCfTypeToString(cfValue: mimeType)
         return mimeString!
@@ -201,11 +201,10 @@ private class DocumentDownloader: NSObject {
                     headerValues = httpHeaderClass.getDocumentHeaders()
                 }
             }
-            
             headerValues?.enumerateKeysAndObjects({
-                (key : AnyObject, val : AnyObject, stop :UnsafeMutablePointer<ObjCBool>) in
-                lMutableRequest.setValue(val as? String, forHTTPHeaderField: key as! String)
-            } as! (Any, Any, UnsafeMutablePointer<ObjCBool>) -> Void)
+                key, value, _ in
+                lMutableRequest.setValue(value as? String, forHTTPHeaderField: key as! String)
+            })
             
             return lMutableRequest
         }
@@ -218,9 +217,9 @@ private class DocumentDownloader: NSObject {
         get{
             
             let sessionConfig = URLSessionConfiguration.background(withIdentifier: self.uniqueID as String)
-//            let additionalHeaderDictionary : NSMutableDictionary = NSMutableDictionary ()
-//            additionalHeaderDictionary.setValue("application/json", forKey: "Content-Type")
-//            sessionConfig.HTTPAdditionalHeaders = additionalHeaderDictionary
+            //            let additionalHeaderDictionary : NSMutableDictionary = NSMutableDictionary ()
+            //            additionalHeaderDictionary.setValue("application/json", forKey: "Content-Type")
+            //            sessionConfig.HTTPAdditionalHeaders = additionalHeaderDictionary
             
             return sessionConfig
         }
@@ -264,12 +263,12 @@ extension DocumentDownloader: URLSessionDataDelegate{
 extension DocumentDownloader : URLSessionDownloadDelegate{
     
     @objc func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-//        if gResponse.statusCode == 200{
-            self.onSuccess!(location, "Downloaded")
-//        }
-//        else{
-//            self.onError!(response: gResponse, error: nil)
-//        }
+        //        if gResponse.statusCode == 200{
+        self.onSuccess!(location, "Downloaded")
+        //        }
+        //        else{
+        //            self.onError!(response: gResponse, error: nil)
+        //        }
     }
     @objc func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         
@@ -287,10 +286,10 @@ private class DocumentUploader : NSObject {
     fileprivate var gRequestType : NSString!
     fileprivate var uniqueID : NSString!
     
-    fileprivate var onSuccess : ((_ response : HTTPURLResponse) -> Void)?
-    fileprivate var onError : ((_ response : HTTPURLResponse, _ error : NSError?) -> Void)?
+    fileprivate var onSuccess : ((_ response : HTTPURLResponse, Any) -> Void)?
+    fileprivate var onError : ((_ response : HTTPURLResponse, Any?) -> Void)?
     fileprivate var inProgress : ((_ bytesSent: Int64, _ totalBytesSent: Int64, _ totalBytesExpectedToSend: Int64) -> Void)?
-    
+    fileprivate var recievedData : Data!
     fileprivate var headerValues : NSMutableDictionary?
     
     fileprivate var gResponse : HTTPURLResponse!
@@ -322,9 +321,9 @@ private class DocumentUploader : NSObject {
             }
             
             headerValues?.enumerateKeysAndObjects({
-                (key : AnyObject, val : AnyObject, stop :UnsafeMutablePointer<ObjCBool>) in
-                lMutableRequest.setValue(val as? String, forHTTPHeaderField: key as! String)
-            } as! (Any, Any, UnsafeMutablePointer<ObjCBool>) -> Void)
+                key, value, _ in
+                lMutableRequest.setValue(value as? String, forHTTPHeaderField: key as! String)
+            })
             
             if gRequestType.isEqual("POST")  || gRequestType.isEqual("PUT"){
                 let mutipartContentType = NSString(format: "multipart/form-data; boundary=%@", FILEBOUNDARY)
@@ -334,9 +333,9 @@ private class DocumentUploader : NSObject {
             return lMutableRequest
         }
     }
-
     
-    fileprivate func uploadDocumentWithURl(_ urlString : NSString, formData : Data, uniqueID : NSString, Progress : @escaping (_ bytesSent: Int64, _ totalBytesSent: Int64, _ totalBytesExpectedToSend: Int64) -> Void, Success : @escaping (_ response : HTTPURLResponse) -> Void, Error : @escaping (_ response : HTTPURLResponse, _ error : NSError?) -> Void) {
+    
+    fileprivate func uploadDocumentWithURl(_ urlString : NSString, formData : Data, uniqueID : NSString, Progress : @escaping (_ bytesSent: Int64, _ totalBytesSent: Int64, _ totalBytesExpectedToSend: Int64) -> Void, Success : @escaping (_ response : HTTPURLResponse, Any) -> Void, Error : @escaping (_ response : HTTPURLResponse, _ error : Any?) -> Void) {
         
         self.gRequestType = "POST"
         self.gURl = urlString
@@ -345,14 +344,14 @@ private class DocumentUploader : NSObject {
         inProgress = Progress
         onSuccess = Success
         onError = Error
-    
+        
         let sessionConfig : URLSessionConfiguration = URLSessionConfiguration.default
         
         backgroundUploadSession = Foundation.URLSession(configuration: sessionConfig, delegate: self, delegateQueue:OperationQueue.main)
         
         let uploadTask : URLSessionUploadTask = backgroundUploadSession.uploadTask(with: mutableRequest as URLRequest, from: formData)
         uploadTask.resume()
-    
+        
     }
 }
 
@@ -360,10 +359,17 @@ extension DocumentUploader: URLSessionDataDelegate{
     
     func urlSession(_ session: Foundation.URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (Foundation.URLSession.ResponseDisposition) -> Void) {
         gResponse = response as? HTTPURLResponse
+        recievedData = Data()
         
-//        print("\(gResponse)")
+        //        print("\(gResponse)")
         completionHandler(.allow);
     }
+    
+    
+    fileprivate func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        recievedData.append(data)
+    }
+    
 }
 
 extension DocumentUploader : URLSessionTaskDelegate{
@@ -371,19 +377,47 @@ extension DocumentUploader : URLSessionTaskDelegate{
     
     @objc func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
-//        print("session \(session) task : \(task) error : \(error)")
-        if error == nil || gResponse?.statusCode == 200 {
-            self.onSuccess!(gResponse)
+        //        print("session \(session) task : \(task) error : \(error)")
+        
+        if (error == nil) {
+            let responseDict : Any!
+            do{
+                
+                responseDict = try JSONSerialization.jsonObject(with: recievedData, options: .allowFragments)
+                //                print(responseDict)
+            }
+            catch{
+                print("serialization failed")
+                let error : NSError = NSError.init(domain: "SerializationFailed", code: 0, userInfo: nil)
+                if gResponse!.statusCode == 200 {
+                    if (recievedData != nil) {
+                        onSuccess!(gResponse, recievedData)
+                    }else{
+                        onSuccess!(gResponse, ["message" : "success"])
+                    }
+                }
+                else{
+                    onError!(gResponse, error)
+                }
+                return
+            }
+            
+            if gResponse!.statusCode == 200 {
+                onSuccess!(gResponse, responseDict)
+            }
+            else{
+                onError!(gResponse, responseDict)
+            }
         }
         else{
-            self.onError!(gResponse, error as NSError?)
+            onError!(gResponse ?? HTTPURLResponse(), error!)
         }
-        
+
     }
     
     @objc func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
         
-//        print("byte send \(bytesSent) expected : \(totalBytesExpectedToSend) ")
+        //        print("byte send \(bytesSent) expected : \(totalBytesExpectedToSend) ")
         self.inProgress!(bytesSent, totalBytesSent, totalBytesExpectedToSend)
         
     }

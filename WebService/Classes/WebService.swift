@@ -77,7 +77,7 @@ class HTTPHeaders: NSObject {
 
 open class WebService: NSObject {
     
-    fileprivate var gURLString : NSString!
+    fileprivate var gURLString : String!
 
     open
     
@@ -104,7 +104,7 @@ open class WebService: NSObject {
     func sendRequest(_ lUrl : String, parameters : AnyObject?, requestType : HTTPMethod, success : @escaping (HTTPURLResponse?, Any) -> Void, failed : @escaping (HTTPURLResponse?, Any?) -> Void, encoded : Bool) {
         let webSessionObject : WebServiceSession = WebServiceSession()
         webSessionObject.headerValues = httpHeaders
-        webSessionObject.sendHTTPRequestWithURL(lUrl as NSString, requestType: requestType, parameters: parameters, success: success, failed: failed, lEncoded: encoded)
+        webSessionObject.sendHTTPRequestWithURL(lUrl, requestType: requestType, parameters: parameters, success: success, failed: failed, lEncoded: encoded)
     }
 }
 
@@ -115,7 +115,7 @@ class WebServiceSession: NSObject {
     fileprivate var onSuccess :  ((HTTPURLResponse?, Any) -> Void)?
     fileprivate var onError :  ((HTTPURLResponse?, Any?) -> Void)?
     
-    fileprivate var gURLString : NSString = ""
+    fileprivate var gURLString : String = ""
     fileprivate var gRequestType : HTTPMethod = .get
     
     fileprivate var recievedData : Data!
@@ -138,7 +138,7 @@ class WebServiceSession: NSObject {
         }
         get {
             
-            var lMutableRequest : URLRequest = URLRequest(url: URL(string: self.gURLString as String)!)
+            var lMutableRequest : URLRequest = URLRequest(url: URL(string: self.gURLString)!)
             lMutableRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
             lMutableRequest.httpMethod = self.getRequestType()
             let httpHeaderClass = HTTPHeaders.sharedInstance
@@ -196,7 +196,7 @@ class WebServiceSession: NSObject {
      - parameter failed:      failed block when service fails
      - parameter lEncoded:    bool value to determine parameter to be encoded within the url or not
      */
-    func sendHTTPRequestWithURL(_ url : NSString, requestType: HTTPMethod, parameters: AnyObject?,success : @escaping (HTTPURLResponse?, Any) -> Void, failed : @escaping (HTTPURLResponse?, Any?) -> Void, lEncoded : Bool)  {
+    func sendHTTPRequestWithURL(_ url : String, requestType: HTTPMethod, parameters: AnyObject?,success : @escaping (HTTPURLResponse?, Any) -> Void, failed : @escaping (HTTPURLResponse?, Any?) -> Void, lEncoded : Bool)  {
         gURLString = url
         gRequestType = requestType
         encoded = lEncoded
@@ -230,7 +230,7 @@ class WebServiceSession: NSObject {
                 encodedParamArray.add(NSString(format: "%@=%@", PercentEscapedQueryKeyFromStringWithEncoding(parameterKey as! NSString), PercentEscapedQueryKeyFromStringWithEncoding(parameterValue as! NSString)))
             })
             
-            let encodedURL : NSString = NSString(format: "%@?%@", gURLString, encodedParamArray.componentsJoined(by: "&"))
+            let encodedURL : String = String(format: "%@?%@", gURLString, encodedParamArray.componentsJoined(by: "&"))
             gURLString = encodedURL
         }
         
@@ -275,30 +275,39 @@ extension WebServiceSession : URLSessionTaskDelegate {
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         let httpResponse = gResponse as? HTTPURLResponse
         if (error == nil) {
-            var responseObject : Any? = nil
             let responseDict : Any!
             do{
+                
                 responseDict = try JSONSerialization.jsonObject(with: recievedData, options: .allowFragments)
-                responseObject = responseDict
+                //                print(responseDict)
             }
             catch{
-                responseObject = NSError.init(domain: "SerializationFailed", code: 0, userInfo: nil)
+                print("serialization failed")
+                let error : NSError = NSError.init(domain: "SerializationFailed", code: 0, userInfo: nil)
+                if httpResponse!.statusCode == 200 {
+                    if (recievedData != nil) {
+                        onSuccess!(httpResponse, recievedData)
+                    }else{
+                        onSuccess!(httpResponse, ["message" : "success"])
+                    }
+                }
+                else{
+                    onError!(httpResponse, error)
+                }
+                return
             }
             
             if httpResponse!.statusCode == 200 {
-                if (recievedData != nil) {
-                    onSuccess!(httpResponse, recievedData)
-                }else{
-                    onSuccess!(httpResponse, responseObject ?? ["message" : "success"])
-                }
+                onSuccess!(httpResponse, responseDict)
             }
             else{
-                onError!(httpResponse, responseObject ?? ["message" : "failed"])
+                onError!(httpResponse, responseDict)
             }
         }
         else{
             onError!(httpResponse, error!)
         }
+
     }
 }
 
